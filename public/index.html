@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TREND ATELIER v4 — Fashion Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#0e0d0b; --cream:#f5f0e8; --warm:#e8dfc8;
+  --gold:#b8965a; --gold-light:#d4b07a; --gold-pale:#f0e8d4;
+  --sage:#7a8c6e; --rust:#8b4a2f; --mid:#6b6355;
+  --border:rgba(14,13,11,0.12); --border-gold:rgba(184,150,90,0.3);
+  --forecast:#4a6b8c; --tagwalk:#2a1a30;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cormorant Garamond',serif;background:var(--cream);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:999;}
+.screen{display:none;min-height:100vh;} .screen.active{display:flex;}
+
+/* AUTH */
+#auth-screen{flex-direction:column;align-items:center;justify-content:center;background:var(--ink);position:relative;overflow:hidden;}
+#auth-screen::before{content:'';position:absolute;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(184,150,90,.15),transparent 70%);pointer-events:none;}
+#auth-screen::after{content:'';position:absolute;bottom:-10%;left:-5%;width:400px;height:400px;background:radial-gradient(circle,rgba(139,74,47,.1),transparent 70%);pointer-events:none;}
+.auth-wrapper{width:420px;position:relative;z-index:2;animation:fadeUp .8s ease forwards;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.auth-logo{text-align:center;margin-bottom:40px;}
+.auth-logo .wm{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:5px;}
+.auth-logo .title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:var(--cream);letter-spacing:.05em;line-height:1;}
+.auth-logo .title em{font-style:italic;color:var(--gold-light);}
+.auth-logo .vsub{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.25em;color:var(--mid);text-transform:uppercase;margin-top:7px;}
+.auth-card{background:rgba(245,240,232,.04);border:1px solid rgba(184,150,90,.2);border-radius:2px;padding:34px;backdrop-filter:blur(20px);}
+.tab-row{display:flex;border-bottom:1px solid rgba(184,150,90,.2);margin-bottom:26px;}
+.tab-btn{flex:1;background:none;border:none;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mid);padding:10px;cursor:pointer;position:relative;transition:color .3s;}
+.tab-btn.active{color:var(--gold);}
+.tab-btn.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:var(--gold);}
+.af{display:none;} .af.active{display:block;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.field input{width:100%;background:rgba(245,240,232,.05);border:1px solid rgba(184,150,90,.2);border-radius:1px;padding:10px 14px;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;color:var(--cream);outline:none;transition:border-color .3s;}
+.field input::placeholder{color:rgba(245,240,232,.25);}
+.field input:focus{border-color:var(--gold);}
+.btn-primary{width:100%;background:var(--gold);border:none;border-radius:1px;padding:12px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink);cursor:pointer;margin-top:5px;transition:all .3s;}
+.btn-primary:hover{background:var(--gold-light);transform:translateY(-1px);}
+.auth-error{font-family:'DM Mono',monospace;font-size:9px;color:#c0614a;text-align:center;margin-top:9px;min-height:14px;}
+.auth-footer{text-align:center;margin-top:18px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.15em;color:rgba(107,99,85,.4);}
+
+/* APP */
+#app-screen{flex-direction:column;background:var(--cream);}
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:58px;border-bottom:1px solid var(--border);background:var(--cream);position:sticky;top:0;z-index:100;}
+.header-logo{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:300;letter-spacing:.08em;}
+.header-logo em{font-style:italic;color:var(--gold);}
+.header-nav{display:flex;}
+.nav-btn{background:none;border:none;font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mid);padding:6px 11px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.nav-btn.active{color:var(--ink);border-bottom-color:var(--gold);}
+.nav-btn:hover{color:var(--ink);}
+.badge{display:inline-block;font-size:5px;letter-spacing:.08em;background:var(--rust);color:white;padding:1px 4px;border-radius:1px;vertical-align:super;margin-left:2px;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.user-pill{display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.12em;color:var(--mid);text-transform:uppercase;}
+.user-avatar{width:25px;height:25px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:11px;font-weight:600;color:var(--ink);}
+.logout-btn{background:none;border:1px solid var(--border);border-radius:1px;padding:4px 9px;font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:var(--mid);cursor:pointer;transition:all .2s;}
+.logout-btn:hover{border-color:var(--gold);color:var(--gold);}
+.app-content{flex:1;overflow-y:auto;}
+.panel{display:none;} .panel.active{display:block;}
+.page-wrap{padding:40px 32px;max-width:1100px;margin:0 auto;}
+
+/* SHARED */
+.panel-heading{margin-bottom:28px;}
+.panel-heading h2{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;margin-bottom:4px;}
+.panel-heading h2 em{font-style:italic;color:var(--gold);}
+.panel-heading p{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:300;color:var(--mid);font-style:italic;}
+.sec-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--mid);margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.spinner{width:15px;height:15px;border:1px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-row{display:flex;align-items:center;gap:9px;padding:18px 0;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--mid);}
+.btn-gold{background:var(--gold);border:none;border-radius:1px;padding:10px 22px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);cursor:pointer;transition:all .25s;}
+.btn-gold:hover{background:var(--gold-light);transform:translateY(-1px);}
+.btn-gold:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-ink{background:var(--ink);border:none;border-radius:1px;padding:10px 22px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);cursor:pointer;transition:all .25s;}
+.btn-ink:hover{background:#1a1915;transform:translateY(-1px);}
+.btn-ink:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-outline{background:none;border:1px solid var(--border);border-radius:1px;padding:8px 16px;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--mid);cursor:pointer;transition:all .2s;}
+.btn-outline:hover{border-color:var(--gold);color:var(--ink);}
+.result-block{background:white;border:1px solid var(--border-gold);padding:24px;display:none;animation:fadeUp .45s ease;margin-top:16px;}
+.rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:11px;border-bottom:1px solid var(--border);}
+.rh-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);}
+.rh-meta{font-family:'DM Mono',monospace;font-size:7px;color:var(--mid);}
+.result-body{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;line-height:1.85;color:var(--ink);white-space:pre-wrap;}
+.chip{padding:5px 12px;border:1px solid var(--border);background:none;font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--mid);cursor:pointer;border-radius:1px;transition:all .2s;}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--gold);}
+.chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.search-row{display:flex;gap:9px;margin-bottom:12px;}
+.search-input{flex:1;background:white;border:1px solid var(--border);border-radius:1px;padding:10px 15px;font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--ink);outline:none;transition:border-color .3s;}
+.search-input:focus{border-color:var(--gold);}
+.search-input::placeholder{color:var(--mid);font-style:italic;}
+.sub-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:22px;}
+.sub-tab{background:none;border:none;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--mid);padding:8px 14px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.sub-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.sub-panel{display:none;} .sub-panel.active{display:block;}
+.live-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:#4caf7d;margin-right:4px;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* DASHBOARD */
+.dash-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);}
+.greeting{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;line-height:1.15;}
+.greeting em{font-style:italic;color:var(--gold);}
+.date-badge{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;color:var(--mid);text-transform:uppercase;}
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px;}
+.stat-card{background:white;border:1px solid var(--border);padding:16px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);}
+.stat-label{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.22em;text-transform:uppercase;color:var(--mid);margin-bottom:6px;}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;line-height:1;}
+.stat-sub{font-family:'DM Mono',monospace;font-size:7px;color:var(--sage);margin-top:3px;}
+.trends-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.trend-card{background:white;border:1px solid var(--border);padding:16px;cursor:pointer;transition:all .25s;}
+.trend-card:hover{border-color:var(--gold);box-shadow:0 5px 24px rgba(14,13,11,.08);transform:translateY(-2px);}
+.trend-cat{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+.trend-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:400;margin-bottom:4px;}
+.trend-desc{font-family:'Cormorant Garamond',serif;font-size:12px;font-weight:300;color:var(--mid);line-height:1.5;font-style:italic;}
+.strength-row{display:flex;align-items:center;gap:6px;margin-top:10px;}
+.strength-bar{flex:1;height:2px;background:var(--warm);border-radius:1px;overflow:hidden;}
+.strength-fill{height:100%;background:linear-gradient(to right,var(--gold),var(--gold-light));}
+.strength-pct{font-family:'DM Mono',monospace;font-size:7px;color:var(--mid);}
+
+/* IMAGE GRID */
+.image-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:16px 0;}
+.img-card{background:white;border:1px solid var(--border);overflow:hidden;position:relative;aspect-ratio:3/4;}
+.img-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s;}
+.img-card:hover img{transform:scale(1.03);}
+.img-card-info{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(14,13,11,.75));padding:10px 8px 8px;opacity:0;transition:opacity .3s;}
+.img-card:hover .img-card-info{opacity:1;}
+.img-card-src{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-light);}
+.img-card-title{font-family:'Cormorant Garamond',serif;font-size:11px;color:white;line-height:1.3;margin-top:2px;}
+.img-placeholder{width:100%;height:100%;background:var(--warm);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:7px;color:var(--mid);text-align:center;padding:8px;}
+.image-search-controls{display:flex;gap:9px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+
+/* IMAGE UPLOAD / ANALYZE */
+.upload-zone{border:2px dashed var(--border-gold);background:rgba(184,150,90,.03);border-radius:2px;padding:40px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:16px;position:relative;}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--gold);background:rgba(184,150,90,.06);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:32px;margin-bottom:10px;display:block;}
+.upload-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--ink);margin-bottom:4px;}
+.upload-sub{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:var(--mid);}
+.preview-area{display:none;margin-bottom:16px;}
+.preview-img-wrap{position:relative;display:inline-block;}
+.preview-img{max-height:320px;max-width:100%;border:1px solid var(--border);display:block;}
+.preview-clear{position:absolute;top:6px;right:6px;background:var(--ink);color:var(--cream);border:none;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;}
+
+/* TAGWALK */
+.tagwalk-banner{background:linear-gradient(135deg,#1a0d22,#2a1540);border:1px solid rgba(150,90,184,.25);padding:18px 22px;margin-bottom:18px;display:flex;align-items:flex-start;gap:14px;}
+.tw-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.tw-banner-text{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:300;color:rgba(245,240,232,.75);line-height:1.6;}
+.tw-banner-text strong{color:#c9a0ea;font-weight:400;}
+.tagwalk-form{background:white;border:1px solid var(--border);padding:22px;margin-bottom:16px;}
+.tw-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.tff label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px;}
+.tff select,.tff input{width:100%;background:var(--cream);border:1px solid var(--border);border-radius:1px;padding:9px 12px;font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .3s;appearance:none;}
+.tff select:focus,.tff input:focus{border-color:var(--gold);}
+.tff-full{grid-column:1/-1;}
+.tw-result-block{background:white;border:1px solid rgba(150,90,184,.25);padding:24px;display:none;animation:fadeUp .45s ease;margin-top:14px;}
+.tw-rh .rh-label{color:#9a6ec4;}
+
+/* SOCIAL */
+.social-banner{background:linear-gradient(135deg,#1a0e0b,#2a1a10);border:1px solid rgba(192,97,74,.3);padding:16px 20px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;}
+.platform-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.platform-card{background:white;border:2px solid var(--border);padding:16px;cursor:pointer;transition:all .2s;position:relative;}
+.platform-card.selected{border-color:var(--rust);background:rgba(139,74,47,.03);}
+.platform-card input[type=checkbox]{position:absolute;top:12px;right:12px;accent-color:var(--rust);}
+.plat-name{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);margin-bottom:3px;}
+.plat-desc{font-family:'Cormorant Garamond',serif;font-size:12px;font-weight:300;color:var(--mid);font-style:italic;line-height:1.45;}
+
+/* FORECAST */
+.forecast-banner{background:linear-gradient(135deg,#0a1520,#0e1d2e);border:1px solid rgba(74,107,140,.4);padding:16px 20px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;}
+.horizon-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.horizon-card{background:white;border:2px solid var(--border);padding:16px;cursor:pointer;transition:all .2s;text-align:center;}
+.horizon-card:hover,.horizon-card.selected{border-color:#4a6b8c;background:rgba(74,107,140,.04);}
+.horizon-num{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:#4a6b8c;line-height:1;}
+.horizon-unit{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:var(--mid);margin-top:3px;}
+.horizon-desc{font-family:'Cormorant Garamond',serif;font-size:11px;font-weight:300;color:var(--mid);font-style:italic;margin-top:5px;line-height:1.35;}
+.forecast-form{background:white;border:1px solid var(--border);padding:22px;margin-bottom:14px;}
+.ff-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.ff label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px;}
+.ff select,.ff input[type=text]{width:100%;background:var(--cream);border:1px solid var(--border);border-radius:1px;padding:9px 12px;font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--ink);outline:none;transition:border-color .3s;appearance:none;}
+.ff select:focus,.ff input[type=text]:focus{border-color:var(--gold);}
+.ff-full{grid-column:1/-1;}
+.forecast-result-block{background:white;border:1px solid rgba(74,107,140,.4);padding:24px;display:none;animation:fadeUp .45s ease;margin-top:14px;}
+.forecast-cover{background:linear-gradient(135deg,#0a1520,#1a2d40);padding:28px;margin:-24px -24px 20px;text-align:center;}
+.fc-eyebrow{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.35em;text-transform:uppercase;color:#8ab4d4;margin-bottom:7px;}
+.fc-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:var(--cream);margin-bottom:3px;}
+.fc-sub{font-family:'Cormorant Garamond',serif;font-size:12px;font-style:italic;color:rgba(138,180,212,.8);}
+.timeline-bar{display:flex;border:1px solid rgba(74,107,140,.25);margin:16px 0;}
+.tl-seg{flex:1;padding:8px;text-align:center;border-right:1px solid rgba(74,107,140,.2);}
+.tl-seg:last-child{border-right:none;}
+.tl-label{font-family:'DM Mono',monospace;font-size:6px;letter-spacing:.14em;text-transform:uppercase;color:#4a6b8c;margin-bottom:3px;}
+.tl-status{font-family:'Cormorant Garamond',serif;font-size:11px;font-weight:300;font-style:italic;color:var(--mid);}
+
+/* ANALYZE */
+.analyze-box{background:white;border:1px solid var(--border);padding:22px;margin-bottom:14px;}
+.box-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:8px;}
+.analyze-textarea{width:100%;min-height:110px;background:var(--cream);border:1px solid var(--border);border-radius:1px;padding:13px;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;color:var(--ink);line-height:1.7;resize:vertical;outline:none;transition:border-color .3s;}
+.analyze-textarea:focus{border-color:var(--gold);}
+.analyze-textarea::placeholder{color:var(--mid);font-style:italic;}
+
+/* REPORTS */
+.report-out{display:none;background:white;border:1px solid var(--border-gold);animation:fadeUp .45s ease;}
+.report-cover{background:var(--ink);padding:30px;text-align:center;}
+.rc-label{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.35em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.rc-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;color:var(--cream);margin-bottom:4px;}
+.rc-sub{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:300;font-style:italic;color:var(--gold-light);}
+.report-body-text{padding:26px;font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:300;line-height:1.9;color:var(--ink);white-space:pre-wrap;}
+.report-actions{padding:14px 26px;border-top:1px solid var(--border);display:flex;gap:9px;}
+.ff-grid-r{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+
+/* HISTORY */
+.hist-list{display:flex;flex-direction:column;gap:6px;}
+.hi{background:white;border:1px solid var(--border);padding:13px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;transition:border-color .2s;}
+.hi:hover{border-color:var(--gold);}
+.hi-type{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:3px;color:var(--gold);}
+.hi-text{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:300;color:var(--ink);}
+.hi-date{font-family:'DM Mono',monospace;font-size:7px;color:var(--mid);white-space:nowrap;}
+.hist-empty{text-align:center;padding:50px;font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:var(--mid);}
+
+/* FOOTER */
+.app-footer{padding:11px 32px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.footer-brand{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:var(--mid);}
+.footer-tagline{font-family:'Cormorant Garamond',serif;font-size:11px;font-style:italic;color:var(--mid);}
+
+/* LIVE FEED */
+.feed-list{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto;margin-bottom:12px;}
+.art-row{background:white;border:1px solid var(--border);padding:11px 14px;display:flex;align-items:flex-start;gap:10px;}
+.art-row input[type=checkbox]{margin-top:2px;accent-color:var(--gold);flex-shrink:0;}
+.art-src{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:2px;}
+.art-title{font-family:'Cormorant Garamond',serif;font-size:13px;line-height:1.4;}
+.art-desc{font-family:'Cormorant Garamond',serif;font-size:11px;font-weight:300;color:var(--mid);margin-top:2px;font-style:italic;}
+.feed-empty{padding:28px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--mid);}
+.row-actions{display:flex;gap:9px;align-items:center;margin-bottom:14px;}
+.select-all{background:none;border:none;font-family:'DM Mono',monospace;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);cursor:pointer;}
+.sel-count{font-family:'DM Mono',monospace;font-size:7px;color:var(--mid);}
+
+@media(max-width:800px){
+  .stats-row,.horizon-cards,.platform-cards,.ff-grid,.ff-grid-r,.tw-grid{grid-template-columns:1fr 1fr}
+  .trends-grid{grid-template-columns:1fr}
+  .app-header{padding:0 12px}
+  .page-wrap{padding:22px 14px}
+  .nav-btn{padding:6px 7px;font-size:7px}
+  .image-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen" class="screen active">
+  <div class="auth-wrapper">
+    <div class="auth-logo">
+      <span class="wm">Professional Intelligence</span>
+      <div class="title">Trend <em>Atelier</em></div>
+      <div class="vsub">Fashion Intelligence Platform · v4.0</div>
+    </div>
+    <div class="auth-card">
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('login',this)">Sign In</button>
+        <button class="tab-btn" onclick="switchTab('register',this)">Create Account</button>
+      </div>
+      <div id="login-form" class="af active">
+        <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="your@studio.com"></div>
+        <div class="field"><label>Password</label><input type="password" id="login-pw" placeholder="••••••••"></div>
+        <button class="btn-primary" onclick="handleLogin()">Enter Atelier →</button>
+        <div class="auth-error" id="login-err"></div>
+      </div>
+      <div id="register-form" class="af">
+        <div class="field"><label>Full Name</label><input type="text" id="reg-name" placeholder="Your Name"></div>
+        <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="your@studio.com"></div>
+        <div class="field"><label>Password</label><input type="password" id="reg-pw" placeholder="Min 6 characters"></div>
+        <button class="btn-primary" onclick="handleRegister()">Create Account →</button>
+        <div class="auth-error" id="reg-err"></div>
+      </div>
+    </div>
+    <div class="auth-footer">© 2025 Trend Atelier · Fashion Intelligence Platform</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" class="screen">
+  <header class="app-header">
+    <div class="header-logo">Trend <em>Atelier</em></div>
+    <nav class="header-nav">
+      <button class="nav-btn active" onclick="showPanel('dashboard',this)">Dashboard</button>
+      <button class="nav-btn" onclick="showPanel('live',this)">Live Feed</button>
+      <button class="nav-btn" onclick="showPanel('images',this)">Images <span class="badge">NEW</span></button>
+      <button class="nav-btn" onclick="showPanel('tagwalk',this)">TAGWALK <span class="badge">NEW</span></button>
+      <button class="nav-btn" onclick="showPanel('social',this)">Social Signals</button>
+      <button class="nav-btn" onclick="showPanel('forecast',this)">Forecast</button>
+      <button class="nav-btn" onclick="showPanel('analyze',this)">Analyze</button>
+      <button class="nav-btn" onclick="showPanel('reports',this)">Reports</button>
+      <button class="nav-btn" onclick="showPanel('history',this)">History</button>
+    </nav>
+    <div class="header-right">
+      <div class="user-pill">
+        <div class="user-avatar" id="user-avatar">—</div>
+        <span id="user-name-disp">—</span>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="app-content">
+
+    <!-- DASHBOARD -->
+    <div id="panel-dashboard" class="panel active">
+      <div class="page-wrap">
+        <div class="dash-header">
+          <div class="greeting" id="greeting-block">Good morning,<br><em>Designer</em></div>
+          <div class="date-badge" id="date-badge">—</div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Analyses</div><div class="stat-value" id="s-analyses">0</div><div class="stat-sub">this session</div></div>
+          <div class="stat-card"><div class="stat-label">Reports</div><div class="stat-value" id="s-reports">0</div><div class="stat-sub">generated</div></div>
+          <div class="stat-card"><div class="stat-label">Social Scans</div><div class="stat-value" id="s-social">0</div><div class="stat-sub">TikTok · IG</div></div>
+          <div class="stat-card"><div class="stat-label">Forecasts</div><div class="stat-value" id="s-forecasts">0</div><div class="stat-sub">generated</div></div>
+          <div class="stat-card"><div class="stat-label">Season</div><div class="stat-value" style="font-size:17px">SS 26</div><div class="stat-sub">Spring / Summer</div></div>
+        </div>
+        <div class="sec-label">Trend Signals — SS26</div>
+        <div class="trends-grid">
+          <div class="trend-card" onclick="goImages('quiet luxury fashion editorial runway')"><div class="trend-cat">Color · Click for Images</div><div class="trend-name">Quiet Luxury Redux</div><div class="trend-desc">Tonal dressing — off-whites, ecru and greige with subtle texture play.</div><div class="strength-row"><div class="strength-bar"><div class="strength-fill" style="width:88%"></div></div><div class="strength-pct">88%</div></div></div>
+          <div class="trend-card" onclick="goAnalyze('Sculptural Minimalism')"><div class="trend-cat">Silhouette</div><div class="trend-name">Sculptural Minimalism</div><div class="trend-desc">Architectural volumes — strong shoulders, fluid hems, geometric cuts.</div><div class="strength-row"><div class="strength-bar"><div class="strength-fill" style="width:74%"></div></div><div class="strength-pct">74%</div></div></div>
+          <div class="trend-card" onclick="goTagwalk('bio-fabrication sustainable luxury')"><div class="trend-cat">Materials · Click for TAGWALK</div><div class="trend-name">Bio-Fabrication</div><div class="trend-desc">Mycelium leather, algae textiles and lab-grown silk redefine sustainable luxury.</div><div class="strength-row"><div class="strength-bar"><div class="strength-fill" style="width:61%"></div></div><div class="strength-pct">61%</div></div></div>
+          <div class="trend-card" onclick="goImages('sheer organza fashion runway editorial 2026')"><div class="trend-cat">Construction · Click for Images</div><div class="trend-name">Sheer Layering</div><div class="trend-desc">Transparency as structure — organza and voile layered for depth.</div><div class="strength-row"><div class="strength-bar"><div class="strength-fill" style="width:79%"></div></div><div class="strength-pct">79%</div></div></div>
+          <div class="trend-card" onclick="goAnalyze('Artisan Craft Revival')"><div class="trend-cat">Detail & Finish</div><div class="trend-name">Artisan Craft Revival</div><div class="trend-desc">Hand embroidery, smocking and stitching through slow-made aesthetics.</div><div class="strength-row"><div class="strength-bar"><div class="strength-fill" style="width:66%"></div></div><div class="strength-pct">66%</div></div></div>
+          <div class="trend-card" onclick="goTagwalk('utility femininity cargo fashion womenswear')"><div class="trend-cat">Lifestyle · Click for TAGWALK</div><div class="trend-name">Utility Femininity</div><div class="trend-desc">Workwear codes softened — cargo details on fluid silhouettes.</div><div class="strength-row"><div class="strength-bar"><div class="strength-fill" style="width:70%"></div></div><div class="strength-pct">70%</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE FEED -->
+    <div id="panel-live" class="panel">
+      <div class="page-wrap">
+        <div class="panel-heading"><h2>Live <em>Feed</em></h2><p>Pull real-time articles from top fashion media and analyze with AI.</p></div>
+        <div class="sub-tabs">
+          <button class="sub-tab active" onclick="showSub('rss',this)"><span class="live-dot"></span>RSS Sources</button>
+          <button class="sub-tab" onclick="showSub('websearch',this)">Web Search</button>
+        </div>
+        <div id="sub-rss" class="sub-panel active">
+          <div class="chip-row">
+            <button class="chip on" data-src="Vogue" onclick="this.classList.toggle('on')">Vogue</button>
+            <button class="chip on" data-src="WWD" onclick="this.classList.toggle('on')">WWD</button>
+            <button class="chip on" data-src="Business of Fashion" onclick="this.classList.toggle('on')">BoF</button>
+            <button class="chip on" data-src="Hypebae" onclick="this.classList.toggle('on')">Hypebae</button>
+            <button class="chip on" data-src="Dazed" onclick="this.classList.toggle('on')">Dazed</button>
+            <button class="chip on" data-src="i-D" onclick="this.classList.toggle('on')">i-D</button>
+            <button class="chip" data-src="Harper's Bazaar" onclick="this.classList.toggle('on')">Harper's Bazaar</button>
+            <button class="chip" data-src="Elle" onclick="this.classList.toggle('on')">Elle</button>
+          </div>
+          <div style="display:flex;gap:9px;margin-bottom:18px"><button class="btn-ink" id="rss-btn" onclick="fetchRSS()">↓ Load Articles</button></div>
+          <div id="rss-loading" style="display:none"><div class="loading-row"><div class="spinner"></div>Fetching latest fashion articles…</div></div>
+          <div id="feed-list" class="feed-list" style="display:none"></div>
+          <div id="feed-actions" style="display:none;margin-bottom:14px">
+            <div class="row-actions">
+              <button class="select-all" onclick="selectAll()">Select All</button>
+              <span class="sel-count" id="sel-count"></span>
+              <button class="btn-gold" id="analyze-feed-btn" onclick="analyzeSelected()">✦ Analyze Selected</button>
+            </div>
+          </div>
+          <div class="result-block" id="rss-result"><div class="rh"><div class="rh-label">✦ Live Feed Analysis</div><div class="rh-meta" id="rss-meta">—</div></div><div class="result-body" id="rss-body">—</div></div>
+        </div>
+        <div id="sub-websearch" class="sub-panel">
+          <div class="search-row">
+            <input class="search-input" id="web-query" placeholder="e.g. SS26 color trends, quiet luxury 2026…" onkeydown="if(event.key==='Enter')runWebSearch()">
+            <button class="btn-ink" id="wsearch-btn" onclick="runWebSearch()">Search + Analyze</button>
+          </div>
+          <div class="chip-row" style="margin-bottom:18px">
+            <button class="chip" onclick="quickSearch('SS26 women fashion trends 2026')">SS26 Overview</button>
+            <button class="chip" onclick="quickSearch('quiet luxury fashion 2026')">Quiet Luxury</button>
+            <button class="chip" onclick="quickSearch('sustainable fashion materials 2026')">Sustainable</button>
+            <button class="chip" onclick="quickSearch('fashion week SS26 womenswear highlights')">Fashion Week</button>
+            <button class="chip" onclick="quickSearch('color forecast spring summer 2026 womenswear')">Color Forecast</button>
+          </div>
+          <div id="wsearch-loading" style="display:none"><div class="loading-row"><div class="spinner"></div>Searching the fashion web…</div></div>
+          <div class="result-block" id="wsearch-result"><div class="rh"><div class="rh-label">✦ Web Analysis</div><div class="rh-meta" id="wsearch-meta">—</div></div><div class="result-body" id="wsearch-body">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMAGES -->
+    <div id="panel-images" class="panel">
+      <div class="page-wrap">
+        <div class="panel-heading"><h2>Visual <em>Intelligence</em></h2><p>Search runway and editorial images by trend — or upload a photo for AI visual analysis.</p></div>
+        <div class="sub-tabs">
+          <button class="sub-tab active" onclick="showSub('imgsearch',this)">Search Images</button>
+          <button class="sub-tab" onclick="showSub('imgupload',this)">Analyze My Image</button>
+        </div>
+
+        <!-- IMAGE SEARCH -->
+        <div id="sub-imgsearch" class="sub-panel active">
+          <div class="sec-label">Search Runway & Editorial Images</div>
+          <div class="image-search-controls">
+            <input class="search-input" id="img-query" placeholder="e.g. sheer layering runway SS26, quiet luxury editorial, sculptural silhouette fashion…" style="flex:1" onkeydown="if(event.key==='Enter')searchImages()">
+            <button class="btn-ink" id="imgsearch-btn" onclick="searchImages()">Search Images</button>
+          </div>
+          <div class="chip-row" style="margin-bottom:16px">
+            <button class="chip" onclick="imgQuick('quiet luxury fashion editorial 2026')">Quiet Luxury</button>
+            <button class="chip" onclick="imgQuick('sheer organza runway fashion SS26')">Sheer Layering</button>
+            <button class="chip" onclick="imgQuick('sculptural fashion minimalism runway 2026')">Sculptural</button>
+            <button class="chip" onclick="imgQuick('artisan embroidery fashion detail runway')">Artisan Craft</button>
+            <button class="chip" onclick="imgQuick('utility femininity cargo fashion womenswear')">Utility</button>
+            <button class="chip" onclick="imgQuick('neutral tonal fashion beige cream wardrobe')">Neutral Palette</button>
+          </div>
+          <div id="imgsearch-loading" style="display:none"><div class="loading-row"><div class="spinner"></div>Searching fashion images…</div></div>
+          <div id="image-grid-container"></div>
+          <div id="img-analysis-area" style="display:none">
+            <div class="result-block" id="img-analysis-result" style="display:block">
+              <div class="rh"><div class="rh-label">✦ Visual Trend Analysis</div><div class="rh-meta" id="img-analysis-meta">—</div></div>
+              <div class="result-body" id="img-analysis-body">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IMAGE UPLOAD -->
+        <div id="sub-imgupload" class="sub-panel">
+          <div class="sec-label">Upload Image for AI Analysis</div>
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="img-file-input" accept="image/*" onchange="handleImageUpload(event)">
+            <span class="upload-icon">🖼️</span>
+            <div class="upload-title">Drop a runway photo, editorial or lookbook image</div>
+            <div class="upload-sub" style="margin-top:6px">JPG · PNG · WEBP · Max 10MB</div>
+          </div>
+          <div class="preview-area" id="preview-area">
+            <div class="preview-img-wrap">
+              <img id="preview-img" class="preview-img" src="" alt="Preview">
+              <button class="preview-clear" onclick="clearImage()">✕</button>
+            </div>
+          </div>
+          <div class="analyze-box" style="margin-top:0">
+            <label class="box-label">Analysis Focus (optional)</label>
+            <div class="chip-row">
+              <button class="chip on" onclick="this.classList.toggle('on')">Color Story</button>
+              <button class="chip on" onclick="this.classList.toggle('on')">Silhouette</button>
+              <button class="chip on" onclick="this.classList.toggle('on')">Materials</button>
+              <button class="chip on" onclick="this.classList.toggle('on')">Styling</button>
+              <button class="chip" onclick="this.classList.toggle('on')">Brand DNA</button>
+              <button class="chip" onclick="this.classList.toggle('on')">Market Position</button>
+              <button class="chip" onclick="this.classList.toggle('on')">Trend Stage</button>
+            </div>
+            <input class="search-input" id="img-context" placeholder="Any additional context — brand, season, collection name…" style="margin-top:8px;width:100%">
+          </div>
+          <div style="display:flex;gap:9px;margin-bottom:10px">
+            <button class="btn-ink" id="imganalyze-btn" onclick="analyzeUploadedImage()" disabled>✦ Analyze Image</button>
+            <button class="btn-outline" onclick="clearImage()">Clear</button>
+          </div>
+          <div id="imganalyze-loading" style="display:none"><div class="loading-row"><div class="spinner"></div>Analyzing image with AI vision…</div></div>
+          <div class="result-block" id="imganalyze-result">
+            <div class="rh"><div class="rh-label">✦ Visual Trend Analysis</div><div class="rh-meta" id="imganalyze-meta">—</div></div>
+            <div class="result-body" id="imganalyze-body">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAGWALK -->
+    <div id="panel-tagwalk" class="panel">
+      <div class="page-wrap">
+        <div class="panel-heading"><h2>TAGWALK <em>Intelligence</em></h2><p>Fashion show coverage, looks and trend data — scanned via AI web intelligence.</p></div>
+
+        <div class="tagwalk-banner">
+          <div class="tw-icon">🏷️</div>
+          <div class="tw-banner-text">
+            Since TAGWALK's full API requires a PRO subscription, this module uses <strong>AI-powered web scanning</strong> to extract publicly available runway looks, designer show coverage and trend tags from TAGWALK and equivalent sources — delivering professional show intelligence without direct API access.
+          </div>
+        </div>
+
+        <div class="sub-tabs">
+          <button class="sub-tab active" onclick="showSub('tw-search',this)">Show Search</button>
+          <button class="sub-tab" onclick="showSub('tw-designer',this)">By Designer</button>
+          <button class="sub-tab" onclick="showSub('tw-trend',this)">By Trend Tag</button>
+        </div>
+
+        <!-- TW SHOW SEARCH -->
+        <div id="sub-tw-search" class="sub-panel active">
+          <div class="tagwalk-form">
+            <div class="tw-grid">
+              <div class="tff"><label>Season</label>
+                <select id="tw-season"><option>Spring Summer 2026</option><option>Fall Winter 2025</option><option>Pre-Fall 2026</option><option>Resort 2026</option><option>Haute Couture SS26</option></select>
+              </div>
+              <div class="tff"><label>Category</label>
+                <select id="tw-cat"><option>Womenswear</option><option>Menswear</option><option>Couture</option><option>Resort</option></select>
+              </div>
+              <div class="tff tff-full"><label>Search (trend, look, keyword)</label>
+                <input type="text" id="tw-query" placeholder="e.g. sheer dresses, tailoring, red carpet, floral, minimalism…" onkeydown="if(event.key==='Enter')runTagwalkSearch()">
+              </div>
+            </div>
+            <button class="btn-ink" id="tw-search-btn" onclick="runTagwalkSearch()" style="background:#2a1540;color:#c9a0ea">🏷️ Search TAGWALK</button>
+          </div>
+        </div>
+
+        <!-- TW DESIGNER -->
+        <div id="sub-tw-designer" class="sub-panel">
+          <div class="tagwalk-form">
+            <div class="tw-grid">
+              <div class="tff"><label>Designer / Brand</label>
+                <input type="text" id="tw-designer-name" placeholder="e.g. Valentino, Bottega Veneta, Jacquemus, Loewe…">
+              </div>
+              <div class="tff"><label>Season</label>
+                <select id="tw-designer-season"><option>Spring Summer 2026</option><option>Fall Winter 2025</option><option>Pre-Fall 2026</option><option>Resort 2026</option></select>
+              </div>
+            </div>
+            <button class="btn-ink" id="tw-designer-btn" onclick="runDesignerSearch()" style="background:#2a1540;color:#c9a0ea">🏷️ Analyze Designer Show</button>
+          </div>
+        </div>
+
+        <!-- TW TREND TAG -->
+        <div id="sub-tw-trend" class="sub-panel">
+          <div class="tagwalk-form">
+            <div class="tff tff-full" style="margin-bottom:12px"><label>Trend Tag</label>
+              <input type="text" id="tw-tag" placeholder="e.g. sheer, tailoring, crochet, metallics, all-white, animal print…">
+            </div>
+            <div class="chip-row" style="margin-bottom:12px">
+              <button class="chip" onclick="setTag('sheer')">Sheer</button>
+              <button class="chip" onclick="setTag('tailoring')">Tailoring</button>
+              <button class="chip" onclick="setTag('crochet')">Crochet</button>
+              <button class="chip" onclick="setTag('metallics')">Metallics</button>
+              <button class="chip" onclick="setTag('all-white')">All-White</button>
+              <button class="chip" onclick="setTag('animal print')">Animal Print</button>
+              <button class="chip" onclick="setTag('minimal')">Minimal</button>
+              <button class="chip" onclick="setTag('volume sleeves')">Volume Sleeves</button>
+            </div>
+            <button class="btn-ink" id="tw-tag-btn" onclick="runTagSearch()" style="background:#2a1540;color:#c9a0ea">🏷️ Scan Runway by Tag</button>
+          </div>
+        </div>
+
+        <div id="tw-loading" style="display:none"><div class="loading-row"><div class="spinner"></div>Scanning TAGWALK and runway sources…</div></div>
+        <div class="tw-result-block result-block" id="tw-result" style="border-color:rgba(150,90,184,.25)">
+          <div class="rh tw-rh"><div class="rh-label" style="color:#9a6ec4">🏷️ TAGWALK Intelligence</div><div class="rh-meta" id="tw-meta">—</div></div>
+          <div class="result-body" id="tw-body">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOCIAL SIGNALS -->
+    <div id="panel-social" class="panel">
+      <div class="page-wrap">
+        <div class="panel-heading"><h2>Social <em>Signals</em></h2><p>Real-time trend intelligence from TikTok and Instagram via AI web scanning.</p></div>
+        <div class="social-banner">
+          <div style="font-size:18px;flex-shrink:0">📱</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:300;color:rgba(245,240,232,.75);line-height:1.6">Scans <strong style="color:var(--gold-light);font-weight:400">TikTok hashtags and Instagram aesthetics</strong> indexed on the web in real time — extracting fashion trend signals from social without needing API access.</div>
+        </div>
+        <div class="platform-cards" style="margin-bottom:14px">
+          <div class="platform-card selected" id="pc-tiktok" onclick="togglePlatform('tiktok')">
+            <input type="checkbox" id="check-tiktok" checked>
+            <div class="plat-name">🎵 TikTok</div>
+            <div class="plat-desc">Viral hashtags, GRWM trends, micro-trends and creator aesthetics driving mass adoption.</div>
+          </div>
+          <div class="platform-card selected" id="pc-instagram" onclick="togglePlatform('instagram')">
+            <input type="checkbox" id="check-instagram" checked>
+            <div class="plat-name">📸 Instagram</div>
+            <div class="plat-desc">Aesthetic movements, influencer styling, brand campaigns shaping visual trend language.</div>
+          </div>
+        </div>
+        <div class="search-row">
+          <input class="search-input" id="social-query" placeholder="e.g. quiet luxury, mob wife, dopamine dressing, balletcore…" onkeydown="if(event.key==='Enter')runSocialScan()">
+          <button class="btn-ink" id="social-btn" onclick="runSocialScan()" style="background:#6b2a1a;color:#f5ddd5">📱 Scan Social</button>
+        </div>
+        <div class="chip-row" style="margin-bottom:18px">
+          <button class="chip" onclick="socialQ('quiet luxury aesthetic tiktok instagram 2026')">Quiet Luxury</button>
+          <button class="chip" onclick="socialQ('mob wife aesthetic fashion tiktok viral')">Mob Wife</button>
+          <button class="chip" onclick="socialQ('dopamine dressing colorful fashion tiktok')">Dopamine Dressing</button>
+          <button class="chip" onclick="socialQ('balletcore fashion trend tiktok 2026')">Balletcore</button>
+          <button class="chip" onclick="socialQ('dark academia fashion aesthetic 2026')">Dark Academia</button>
+          <button class="chip" onclick="socialQ('clean girl aesthetic fashion tiktok style')">Clean Girl</button>
+          <button class="chip" onclick="socialQ('coastal grandmother fashion aesthetic instagram')">Coastal Grandmother</button>
+        </div>
+        <div id="social-loading" style="display:none"><div class="loading-row"><div class="spinner"></div>Scanning social media signals…</div></div>
+        <div class="result-block" id="social-result">
+          <div class="rh"><div class="rh-label" style="color:var(--rust)">📱 Social Signal Report</div><div class="rh-meta" id="social-meta">—</div></div>
+          <div class="result-body" id="social-body">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORECAST -->
+    <div id="panel-forecast" class="panel">
+      <div class="page-wrap">
+        <div class="panel-heading"><h2>Trend <em>Forecast</em></h2><p>AI-powered predictive analysis — where fashion is heading in 3, 6 and 12 months.</p></div>
+        <div class="forecast-banner">
+          <div style="font-size:18px;flex-shrink:0;margin-top:1px">🔭</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:300;color:rgba(245,240,232,.75);line-height:1.6">Analyzes <strong style="color:#8ab4d4;font-weight:400">runway signals, social movements, cultural shifts and historical trend cycles</strong> to project where trends are heading — with commercial implications for each horizon.</div>
+        </div>
+        <div class="sec-label">Select Horizon</div>
+        <div class="horizon-cards">
+          <div class="horizon-card" id="h3" onclick="selectHorizon(3)"><div class="horizon-num">3</div><div class="horizon-unit">Months</div><div class="horizon-desc">Immediate commercial window. What to buy and produce now.</div></div>
+          <div class="horizon-card selected" id="h6" onclick="selectHorizon(6)"><div class="horizon-num">6</div><div class="horizon-unit">Months</div><div class="horizon-desc">Mid-season planning. Design and collection direction.</div></div>
+          <div class="horizon-card" id="h12" onclick="selectHorizon(12)"><div class="horizon-num">12</div><div class="horizon-unit">Months</div><div class="horizon-desc">Full-season outlook. Strategic brand positioning.</div></div>
+        </div>
+        <div class="forecast-form">
+          <div class="ff-grid">
+            <div class="ff"><label>Trend to Forecast</label><input type="text" id="f-trend" placeholder="e.g. Quiet Luxury, Bio-Fabrication, Sheer Layering…"></div>
+            <div class="ff"><label>Category</label><select id="f-category"><option>Overall Trend Direction</option><option>Color & Palette</option><option>Silhouette & Form</option><option>Materials & Fabrication</option><option>Detail & Finish</option><option>Consumer Lifestyle</option></select></div>
+            <div class="ff"><label>Market</label><select id="f-market"><option>Contemporary Women's</option><option>Luxury & Designer</option><option>Fast Fashion</option><option>Sustainable / Slow Fashion</option><option>Mass Market</option></select></div>
+            <div class="ff"><label>Region</label><select id="f-region"><option>Global</option><option>Europe</option><option>North America</option><option>Latin America</option><option>Asia Pacific</option><option>Middle East</option></select></div>
+            <div class="ff ff-full"><label>Additional Context</label><input type="text" id="f-context" placeholder="Brand name, sub-category, price point…"></div>
+          </div>
+          <button class="btn-ink" id="forecast-btn" onclick="generateForecast()" style="background:#1a2d40;color:#8ab4d4">🔭 Generate Forecast</button>
+        </div>
+        <div id="forecast-loading" style="display:none"><div class="loading-row"><div class="spinner"></div>Generating trend forecast…</div></div>
+        <div class="forecast-result-block" id="forecast-result">
+          <div class="forecast-cover"><div class="fc-eyebrow">Trend Atelier · Predictive Intelligence</div><div class="fc-title" id="fc-title">—</div><div class="fc-sub" id="fc-sub">—</div></div>
+          <div class="timeline-bar"><div class="tl-seg"><div class="tl-label">Now</div><div class="tl-status" id="tl-now">—</div></div><div class="tl-seg"><div class="tl-label">3 Months</div><div class="tl-status" id="tl-3">—</div></div><div class="tl-seg"><div class="tl-label">6 Months</div><div class="tl-status" id="tl-6">—</div></div><div class="tl-seg"><div class="tl-label">12 Months</div><div class="tl-status" id="tl-12">—</div></div></div>
+          <div class="result-body" id="forecast-body">—</div>
+          <div style="padding:13px 0;border-top:1px solid var(--border);margin-top:16px;display:flex;gap:9px">
+            <button class="btn-outline" onclick="downloadForecast()">↓ Download</button>
+            <button class="btn-outline" onclick="copyForecast(event)">⎘ Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYZE -->
+    <div id="panel-analyze" class="panel">
+      <div class="page-wrap" style="max-width:820px">
+        <div class="panel-heading"><h2>Trend <em>Analysis</em></h2><p>Paste any fashion content for instant AI trend intelligence.</p></div>
+        <div class="analyze-box">
+          <label class="box-label">Content to Analyze</label>
+          <textarea class="analyze-textarea" id="analyze-input" placeholder="Paste runway descriptions, trend reports, editorial notes, press releases, buyer feedback…"></textarea>
+          <div class="chip-row" style="margin-top:10px">
+            <button class="chip on" onclick="this.classList.toggle('on')">Color</button>
+            <button class="chip on" onclick="this.classList.toggle('on')">Silhouette</button>
+            <button class="chip on" onclick="this.classList.toggle('on')">Materials</button>
+            <button class="chip" onclick="this.classList.toggle('on')">Detail</button>
+            <button class="chip" onclick="this.classList.toggle('on')">Consumer</button>
+            <button class="chip" onclick="this.classList.toggle('on')">Market</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:9px;margin-bottom:7px">
+          <button class="btn-ink" id="analyze-btn" onclick="runManualAnalysis()">↗ Analyze</button>
+          <button class="btn-outline" onclick="clearManual()">Clear</button>
+        </div>
+        <div id="analyze-loading" style="display:none"><div class="loading-row"><div class="spinner"></div>Analyzing…</div></div>
+        <div class="result-block" id="manual-result"><div class="rh"><div class="rh-label">✦ Trend Analysis</div><div class="rh-meta" id="manual-meta">—</div></div><div class="result-body" id="manual-body">—</div></div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="panel-reports" class="panel">
+      <div class="page-wrap" style="max-width:820px">
+        <div class="panel-heading"><h2>Generate <em>Report</em></h2><p>Commission a full AI-written trend intelligence report.</p></div>
+        <div style="background:white;border:1px solid var(--border);padding:22px;margin-bottom:16px">
+          <div class="ff-grid-r">
+            <div class="ff"><label>Season</label><select id="r-season"><option>Spring / Summer 2026</option><option>Fall / Winter 2025</option><option>Pre-Fall 2026</option><option>Resort 2026</option></select></div>
+            <div class="ff"><label>Market</label><select id="r-market"><option>Contemporary Women's</option><option>Luxury & Designer</option><option>Fast Fashion</option><option>Sustainable</option><option>Streetwear</option><option>Workwear</option></select></div>
+            <div class="ff"><label>Focus</label><select id="r-focus"><option>Full Trend Overview</option><option>Color Forecast</option><option>Silhouette & Cut</option><option>Materials</option><option>Key Pieces</option><option>Consumer Lifestyle</option></select></div>
+            <div class="ff"><label>Tone</label><select id="r-tone"><option>Editorial</option><option>Commercial (buyer)</option><option>Strategic</option><option>Executive Summary</option></select></div>
+            <div class="ff" style="grid-column:1/-1"><label>Additional Context</label><input type="text" id="r-context" placeholder="Brand name, categories, geographic focus…"></div>
+          </div>
+          <button class="btn-gold" id="report-btn" onclick="generateReport()">✦ Generate Report</button>
+        </div>
+        <div id="report-loading" style="display:none"><div class="loading-row"><div class="spinner"></div>Writing trend report…</div></div>
+        <div class="report-out" id="report-out">
+          <div class="report-cover"><div class="rc-label">Trend Atelier · Intelligence Report</div><div class="rc-title" id="rc-title">—</div><div class="rc-sub" id="rc-sub">—</div></div>
+          <div class="report-body-text" id="report-body">—</div>
+          <div class="report-actions"><button class="btn-outline" onclick="downloadReport()">↓ Download</button><button class="btn-outline" onclick="copyReport(event)">⎘ Copy</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="panel-history" class="panel">
+      <div class="page-wrap">
+        <div class="panel-heading"><h2>Session <em>History</em></h2><p>All analyses, forecasts and reports from this session.</p></div>
+        <div id="history-container"><div class="hist-empty">No activity yet.</div></div>
+      </div>
+    </div>
+
+  </div>
+  <footer class="app-footer">
+    <div class="footer-brand">Trend Atelier · v4.0 · Images + TAGWALK + Social + Forecast</div>
+    <div class="footer-tagline">Fashion intelligence, elevated by AI</div>
+  </footer>
+</div>
+
+<script>
+// STATE
+let currentUser=null,sessionHistory=[],counts={a:0,r:0,s:0,f:0};
+let feedArticles=[],lastReport='',lastForecast='',selectedHorizon=6;
+let uploadedImageBase64=null,uploadedImageType=null;
+
+// AUTH
+function switchTab(tab,btn){document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.af').forEach(f=>f.classList.remove('active'));btn.classList.add('active');document.getElementById(tab+'-form').classList.add('active');}
+function handleLogin(){const email=document.getElementById('login-email').value.trim(),pw=document.getElementById('login-pw').value,err=document.getElementById('login-err');if(!email||!pw){err.textContent='Please fill in all fields.';return;}const users=JSON.parse(localStorage.getItem('ta_users')||'{}');if(!users[email]){err.textContent='No account found.';return;}if(users[email].password!==btoa(pw)){err.textContent='Incorrect password.';return;}currentUser={email,name:users[email].name};err.textContent='';enterApp();}
+function handleRegister(){const name=document.getElementById('reg-name').value.trim(),email=document.getElementById('reg-email').value.trim(),pw=document.getElementById('reg-pw').value,err=document.getElementById('reg-err');if(!name||!email||!pw){err.textContent='Please fill in all fields.';return;}if(pw.length<6){err.textContent='Min 6 characters.';return;}const users=JSON.parse(localStorage.getItem('ta_users')||'{}');if(users[email]){err.textContent='Account already exists.';return;}users[email]={name,password:btoa(pw)};localStorage.setItem('ta_users',JSON.stringify(users));currentUser={email,name};enterApp();}
+function enterApp(){document.getElementById('auth-screen').classList.remove('active');document.getElementById('app-screen').classList.add('active');const first=currentUser.name.split(' ')[0];const h=new Date().getHours();const greet=h<12?'Good morning,':h<18?'Good afternoon,':'Good evening,';document.getElementById('greeting-block').innerHTML=`${greet}<br><em>${first}</em>`;document.getElementById('user-name-disp').textContent=first.toUpperCase();document.getElementById('user-avatar').textContent=currentUser.name[0].toUpperCase();document.getElementById('date-badge').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}
+function handleLogout(){currentUser=null;sessionHistory=[];counts={a:0,r:0,s:0,f:0};document.getElementById('app-screen').classList.remove('active');document.getElementById('auth-screen').classList.add('active');}
+
+// NAV
+function showPanel(name,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('panel-'+name).classList.add('active');if(btn)btn.classList.add('active');if(name==='history')renderHistory();}
+function showSub(name,btn){const parent=btn.closest('.panel');parent.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));parent.querySelectorAll('.sub-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('sub-'+name).classList.add('active');}
+
+// AI CALL
+async function callAI(prompt,useSearch,imageData,imageType){
+  const body={model:'claude-3-5-haiku-20241022',max_tokens:8000};
+  if(imageData){
+    body.messages=[{role:'user',content:[{type:'image',source:{type:'base64',media_type:imageType,data:imageData}},{type:'text',text:prompt}]}];
+  } else {
+    body.messages=[{role:'user',content:prompt}];
+  }
+  if(useSearch)body.tools=[{type:'web_search_20250305',name:'web_search'}];
+  const res=await fetch('/api/claude',{method:'POST',headers:{'Content-Type':'application/json',},body:JSON.stringify(body)});
+  const data=await res.json();
+  if(data.error){throw new Error('API: '+data.error.message);}
+  const text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+  if(!text){throw new Error('Empty response from API');}
+  return text;
+}
+
+// IMAGE SEARCH
+function imgQuick(q){document.getElementById('img-query').value=q;searchImages();}
+function goImages(q){document.getElementById('img-query').value=q;showPanel('images',document.querySelectorAll('.nav-btn')[2]);showSub('imgsearch',document.querySelector('#panel-images .sub-tab'));}
+
+async function searchImages(){
+  const query=document.getElementById('img-query').value.trim();
+  if(!query){alert('Enter a search query.');return;}
+  const btn=document.getElementById('imgsearch-btn');
+  btn.disabled=true;
+  document.getElementById('imgsearch-loading').style.display='flex';
+  document.getElementById('image-grid-container').innerHTML='';
+  document.getElementById('img-analysis-area').style.display='none';
+
+  // Use AI web search to find image URLs and analyze them
+  const prompt=`You are a fashion image curator and trend analyst. Search the web for high-quality fashion images related to: "${query}"\n\nFirst, find and list 6-8 relevant image URLs from fashion publications, runway databases, or editorial sources (Vogue, WWD, Style.com, Getty Images fashion, Trunk Archive, etc.).\n\nThen provide a visual trend analysis:\n\n**IMAGE SOURCES FOUND**\nList the URLs you found (one per line, starting with http)\n\n**VISUAL TREND ANALYSIS**\nWhat do these images reveal about the trend? Color palette, silhouette language, styling codes, aesthetic direction, brand references.\n\n**KEY VISUAL SIGNALS**\nSpecific visual elements that define this trend.\n\n**STYLING CODES**\nHow is this trend being styled? Key pieces, combinations, accessories.\n\n**VISUAL TREND STAGE**\nBased on the images found: Emerging / Building / Peak / Declining.`;
+
+  try {
+    const result=await callAI(prompt,true);
+    // Extract URLs from result
+    const urlRegex=/(https?:\/\/[^\s\n"'<>]+\.(?:jpg|jpeg|png|webp|gif)[^\s\n"'<>]*)/gi;
+    const urls=[...result.matchAll(urlRegex)].map(m=>m[1]).slice(0,8);
+    // Extract analysis (text after IMAGE SOURCES)
+    const analysisMatch=result.match(/\*\*VISUAL TREND ANALYSIS\*\*([\s\S]*)/);
+    const analysis=analysisMatch?analysisMatch[0]:result;
+    renderImageGrid(urls,query);
+    document.getElementById('img-analysis-body').textContent=analysis;
+    document.getElementById('img-analysis-meta').textContent=`"${query}" · ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+    document.getElementById('img-analysis-area').style.display='block';
+    counts.a++;document.getElementById('s-analyses').textContent=counts.a;
+    sessionHistory.unshift({type:'Images',text:`Image search: "${query}"`,date:new Date().toLocaleString()});
+  } catch(e){document.getElementById('image-grid-container').innerHTML='<div style="padding:20px;font-family:\'Cormorant Garamond\',serif;font-style:italic;color:var(--mid)">Could not load images. Try a different query.</div>';}
+
+  document.getElementById('imgsearch-loading').style.display='none';
+  btn.disabled=false;
+}
+
+function renderImageGrid(urls,query){
+  if(!urls.length){
+    // Show placeholder cards with the query
+    document.getElementById('image-grid-container').innerHTML=`
+      <div style="padding:20px;background:white;border:1px solid var(--border);font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--mid)">
+        Images for "<strong style="font-style:normal">${query}</strong>" were analyzed — see the Visual Trend Analysis below for findings. Direct image embedding may be restricted by source sites.
+      </div>`;
+    return;
+  }
+  const grid=document.createElement('div');
+  grid.className='image-grid';
+  urls.forEach(url=>{
+    const card=document.createElement('div');
+    card.className='img-card';
+    const img=document.createElement('img');
+    img.src=url;
+    img.alt='Fashion image';
+    img.onerror=()=>{card.style.display='none';};
+    const info=document.createElement('div');
+    info.className='img-card-info';
+    info.innerHTML=`<div class="img-card-src">Fashion Image</div>`;
+    card.appendChild(img);
+    card.appendChild(info);
+    grid.appendChild(card);
+  });
+  document.getElementById('image-grid-container').appendChild(grid);
+}
+
+// IMAGE UPLOAD
+function handleImageUpload(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const dataUrl=e.target.result;
+    uploadedImageBase64=dataUrl.split(',')[1];
+    uploadedImageType=file.type||'image/jpeg';
+    document.getElementById('preview-img').src=dataUrl;
+    document.getElementById('preview-area').style.display='block';
+    document.getElementById('upload-zone').style.display='none';
+    document.getElementById('imganalyze-btn').disabled=false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage(){
+  uploadedImageBase64=null;uploadedImageType=null;
+  document.getElementById('preview-area').style.display='none';
+  document.getElementById('upload-zone').style.display='block';
+  document.getElementById('imganalyze-btn').disabled=true;
+  document.getElementById('imganalyze-result').style.display='none';
+  document.getElementById('img-file-input').value='';
+}
+
+async function analyzeUploadedImage(){
+  if(!uploadedImageBase64){alert('Please upload an image first.');return;}
+  const focuses=[...document.querySelectorAll('#sub-imgupload .chip.on')].map(c=>c.textContent);
+  const context=document.getElementById('img-context').value;
+  const btn=document.getElementById('imganalyze-btn');
+  btn.disabled=true;
+  document.getElementById('imganalyze-loading').style.display='flex';
+  document.getElementById('imganalyze-result').style.display='none';
+
+  const prompt=`You are a senior fashion trend analyst with expert visual intelligence. Analyze this fashion image and provide professional trend intelligence.\n\nFocus areas: ${focuses.join(', ')}\n${context?'Additional context: '+context:''}\n\nProvide a structured visual analysis:\n\n**OVERALL AESTHETIC**\nThe visual identity and mood of this image.\n\n**COLOR STORY**\nDetailed palette analysis — hues, values, relationships, emotional resonance.\n\n**SILHOUETTE & PROPORTION**\nShape language, volume distribution, proportion ratios.\n\n**MATERIALS & TEXTURE** (if visible)\nFabric quality, texture, construction.\n\n**STYLING CODES**\nHow pieces are combined, accessorizing, overall look construction.\n\n**TREND IDENTIFICATION**\nWhich current or emerging trends does this image represent or reference?\n\n**BRAND / DESIGNER DNA** (if recognizable)\nAesthetic lineage and market positioning.\n\n**COMMERCIAL INTELLIGENCE**\nWho is the target consumer? Price point? Market positioning?\n\n**TREND STAGE**\nIs this Emerging / Building / Peak / Declining based on what you see?\n\nWrite as a professional fashion trend intelligence report.`;
+
+  try {
+    const result=await callAI(prompt,false,uploadedImageBase64,uploadedImageType);
+    document.getElementById('imganalyze-body').textContent=result;
+    document.getElementById('imganalyze-meta').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('imganalyze-result').style.display='block';
+    counts.a++;document.getElementById('s-analyses').textContent=counts.a;
+    sessionHistory.unshift({type:'Visual Analysis',text:'Image upload analyzed',date:new Date().toLocaleString()});
+  } catch(e){document.getElementById('imganalyze-body').textContent='Error analyzing image. Please try again.';document.getElementById('imganalyze-result').style.display='block';}
+
+  document.getElementById('imganalyze-loading').style.display='none';
+  btn.disabled=false;
+}
+
+// DRAG & DROP
+const uploadZone=document.getElementById('upload-zone');
+uploadZone.addEventListener('dragover',e=>{e.preventDefault();uploadZone.classList.add('dragover');});
+uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop',e=>{e.preventDefault();uploadZone.classList.remove('dragover');const file=e.dataTransfer.files[0];if(file&&file.type.startsWith('image/')){handleImageUpload({target:{files:[file]}});}});
+
+// TAGWALK
+function goTagwalk(q){document.getElementById('tw-query').value=q;showPanel('tagwalk',document.querySelectorAll('.nav-btn')[3]);}
+function setTag(t){document.getElementById('tw-tag').value=t;}
+
+async function runTagwalkQuery(prompt,metaText,btnId){
+  document.getElementById('tw-loading').style.display='flex';
+  document.getElementById('tw-result').style.display='none';
+  const btn=document.getElementById(btnId);
+  if(btn)btn.disabled=true;
+  try {
+    const result=await callAI(prompt,true);
+    document.getElementById('tw-body').textContent=result;
+    document.getElementById('tw-meta').textContent=metaText+' · '+new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('tw-result').style.display='block';
+    counts.a++;document.getElementById('s-analyses').textContent=counts.a;
+    sessionHistory.unshift({type:'TAGWALK',text:metaText,date:new Date().toLocaleString()});
+  } catch {document.getElementById('tw-body').textContent='Error. Please try again.';document.getElementById('tw-result').style.display='block';}
+  document.getElementById('tw-loading').style.display='none';
+  if(btn)btn.disabled=false;
+}
+
+function runTagwalkSearch(){
+  const season=document.getElementById('tw-season').value;
+  const cat=document.getElementById('tw-cat').value;
+  const query=document.getElementById('tw-query').value.trim();
+  if(!query){alert('Enter a search term.');return;}
+  const prompt=`You are a fashion show intelligence analyst. Using web search, find information from TAGWALK, Vogue Runway, Style.com and equivalent runway databases about: "${query}" for ${season} ${cat}.\n\nProvide a professional show intelligence report:\n\n**RUNWAY COVERAGE**\nWhich shows and designers featured this? Specific collections.\n\n**LOOK DESCRIPTIONS**\nDescribe the key looks, styling and silhouettes found.\n\n**COLOR & MATERIAL STORY**\nColor palette and material choices across the shows.\n\n**DESIGNER SIGNATURES**\nHow each major designer interpreted this theme.\n\n**TREND CONSENSUS**\nIs there a strong runway consensus or fragmented interpretations?\n\n**RETAIL TRANSLATION**\nHow is this likely to translate from runway to retail?\n\n**KEY TAKEAWAYS**\nThe 3-5 most important signals from the runway for buyers and designers.`;
+  runTagwalkQuery(prompt,`${query} · ${season} ${cat}`,'tw-search-btn');
+}
+
+function runDesignerSearch(){
+  const designer=document.getElementById('tw-designer-name').value.trim();
+  const season=document.getElementById('tw-designer-season').value;
+  if(!designer){alert('Enter a designer or brand name.');return;}
+  const prompt=`You are a fashion show intelligence analyst. Using web search, research the ${designer} ${season} collection from TAGWALK, Vogue Runway and equivalent sources.\n\nProvide a comprehensive show intelligence report:\n\n**COLLECTION OVERVIEW**\nThe overarching concept, inspiration and narrative.\n\n**KEY LOOKS**\nDescription of standout looks and styling.\n\n**COLOR PALETTE**\nThe season's color story for this collection.\n\n**SILHOUETTE DIRECTION**\nKey shapes and proportions.\n\n**MATERIALS & FABRICATION**\nFabric choices and material innovation.\n\n**ACCESSORIES & DETAILS**\nKey accessories and signature details.\n\n**TREND SIGNALS**\nWhat trends does this collection confirm, introduce or reject?\n\n**COMMERCIAL ASSESSMENT**\nBuyable pieces, commercial potential, target consumer.\n\n**CRITICAL RECEPTION**\nHow was this collection received by press and industry?`;
+  runTagwalkQuery(prompt,`${designer} · ${season}`,'tw-designer-btn');
+}
+
+function runTagSearch(){
+  const tag=document.getElementById('tw-tag').value.trim();
+  if(!tag){alert('Enter a trend tag.');return;}
+  const prompt=`You are a fashion trend analyst. Using web search, scan TAGWALK, Vogue Runway and equivalent runway databases for the trend tag: "${tag}" across current and recent seasons.\n\nProvide a trend tag intelligence report:\n\n**TAG PREVALENCE**\nHow many shows and looks feature this tag? Strong or niche signal?\n\n**TOP DESIGNERS USING THIS TAG**\nWhich designers are most associated with this trend?\n\n**EVOLUTION ACROSS SEASONS**\nHow has this trend evolved from past seasons to current?\n\n**STYLING VARIATIONS**\nDifferent ways this trend is being interpreted.\n\n**COMMERCIAL PENETRATION**\nHas this moved from runway to high street? Evidence.\n\n**PEAK PREDICTION**\nIs this trend building, at peak or declining based on runway data?\n\n**BUYER RECOMMENDATION**\nShould buyers invest now? Which categories and price points?`;
+  runTagwalkQuery(prompt,`Tag: "${tag}"`,'tw-tag-btn');
+}
+
+// RSS
+const RSS_URLS={'Vogue':'https://www.vogue.com/feed/rss','WWD':'https://wwd.com/feed/','Business of Fashion':'https://www.businessoffashion.com/rss','Hypebae':'https://hypebae.com/feed','Dazed':'https://www.dazeddigital.com/rss','i-D':'https://i-d.vice.com/en_us/rss',"Harper's Bazaar":'https://www.harpersbazaar.com/rss/all.xml/','Elle':'https://www.elle.com/rss/all.xml/'};
+function parseRSS(xml,src){const doc=new DOMParser().parseFromString(xml,'text/xml');return[...doc.querySelectorAll('item')].slice(0,5).map(item=>({source:src,title:item.querySelector('title')?.textContent?.replace(/<!\[CDATA\[|\]\]>/g,'').trim()||'',desc:item.querySelector('description')?.textContent?.replace(/<[^>]+>/g,'').replace(/<!\[CDATA\[|\]\]>/g,'').trim().slice(0,150)||''})).filter(a=>a.title);}
+async function fetchRSS(){
+  const sel=[...document.querySelectorAll('#sub-rss .chip.on')].map(c=>c.dataset.src).filter(Boolean);
+  if(!sel.length){alert('Select at least one source.');return;}
+  const btn=document.getElementById('rss-btn');btn.disabled=true;
+  document.getElementById('rss-loading').style.display='flex';
+  document.getElementById('feed-list').style.display='none';
+  document.getElementById('feed-actions').style.display='none';
+  document.getElementById('rss-result').style.display='none';
+  feedArticles=[];
+  const results=await Promise.all(sel.map(async src=>{try{const res=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(RSS_URLS[src]),{signal:AbortSignal.timeout(8000)});return parseRSS(await res.text(),src);}catch{return[];}}));
+  feedArticles=results.flat();
+  document.getElementById('rss-loading').style.display='none';btn.disabled=false;
+  if(!feedArticles.length){document.getElementById('feed-list').innerHTML='<div class="feed-empty">RSS unavailable. Try Web Search.</div>';document.getElementById('feed-list').style.display='flex';return;}
+  document.getElementById('feed-list').innerHTML=feedArticles.map((a,i)=>`<div class="art-row"><input type="checkbox" class="art-check" data-idx="${i}" checked onchange="updateCount()"><div><div class="art-src">${a.source}</div><div class="art-title">${a.title}</div>${a.desc?`<div class="art-desc">${a.desc.slice(0,100)}…</div>`:''}</div></div>`).join('');
+  document.getElementById('feed-list').style.display='flex';
+  document.getElementById('feed-actions').style.display='block';
+  updateCount();
+}
+function selectAll(){document.querySelectorAll('.art-check').forEach(c=>c.checked=true);updateCount();}
+function updateCount(){const n=document.querySelectorAll('.art-check:checked').length;document.getElementById('sel-count').textContent=`${n} selected`;}
+async function analyzeSelected(){
+  const sel=[...document.querySelectorAll('.art-check:checked')].map(c=>feedArticles[+c.dataset.idx]);
+  if(!sel.length){alert('Select at least one article.');return;}
+  const btn=document.getElementById('analyze-feed-btn');btn.disabled=true;
+  document.getElementById('rss-loading').style.display='flex';
+  document.getElementById('rss-result').style.display='none';
+  const txt=sel.map(a=>`[${a.source}] ${a.title}\n${a.desc}`).join('\n\n');
+  const prompt=`Senior fashion trend analyst. Analyze ${sel.length} recent articles:\n"""\n${txt}\n"""\n\nProvide:\n**EMERGING SIGNALS**\n**COLOR & AESTHETIC**\n**SILHOUETTE & FORM**\n**KEY BRANDS & DESIGNERS**\n**CONSUMER SENTIMENT**\n**TREND VELOCITY** (Emerging/Building/Peak/Declining)\n**COMMERCIAL IMPLICATIONS**\n\nProfessional fashion language.`;
+  try{const result=await callAI(prompt,false);document.getElementById('rss-body').textContent=result;document.getElementById('rss-meta').textContent=`${sel.length} articles · ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;document.getElementById('rss-result').style.display='block';counts.a++;document.getElementById('s-analyses').textContent=counts.a;sessionHistory.unshift({type:'Live Feed',text:`${sel.length} articles from ${[...new Set(sel.map(a=>a.source))].join(', ')}`,date:new Date().toLocaleString()});}catch{document.getElementById('rss-body').textContent='Error.';document.getElementById('rss-result').style.display='block';}
+  document.getElementById('rss-loading').style.display='none';btn.disabled=false;
+}
+function quickSearch(q){document.getElementById('web-query').value=q;runWebSearch();}
+async function runWebSearch(){
+  const query=document.getElementById('web-query').value.trim();if(!query){alert('Enter a query.');return;}
+  const btn=document.getElementById('wsearch-btn');btn.disabled=true;
+  document.getElementById('wsearch-loading').style.display='flex';
+  document.getElementById('wsearch-result').style.display='none';
+  const prompt=`Senior fashion trend analyst. Search web and analyze: "${query}"\n\nProvide:\n**WHAT THE WEB SHOWS**\n**KEY TREND FINDINGS**\n**COLOR & AESTHETIC**\n**BRANDS & DESIGNERS LEADING**\n**MARKET SIGNALS**\n**TREND STAGE** (Emerging/Building/Peak/Declining)\n**12-MONTH OUTLOOK**\n\nProfessional trend intelligence style.`;
+  try{const result=await callAI(prompt,true);document.getElementById('wsearch-body').textContent=result;document.getElementById('wsearch-meta').textContent=`"${query}" · ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;document.getElementById('wsearch-result').style.display='block';counts.a++;document.getElementById('s-analyses').textContent=counts.a;sessionHistory.unshift({type:'Web Search',text:`"${query}"`,date:new Date().toLocaleString()});}catch{document.getElementById('wsearch-body').textContent='Error.';document.getElementById('wsearch-result').style.display='block';}
+  document.getElementById('wsearch-loading').style.display='none';btn.disabled=false;
+}
+
+// SOCIAL
+function togglePlatform(name){const card=document.getElementById('pc-'+name);const check=document.getElementById('check-'+name);card.classList.toggle('selected');check.checked=card.classList.contains('selected');}
+function socialQ(q){document.getElementById('social-query').value=q;runSocialScan();}
+async function runSocialScan(){
+  const query=document.getElementById('social-query').value.trim();if(!query){alert('Enter a topic.');return;}
+  const useTT=document.getElementById('check-tiktok').checked;const useIG=document.getElementById('check-instagram').checked;
+  if(!useTT&&!useIG){alert('Select at least one platform.');return;}
+  const platforms=[useTT&&'TikTok',useIG&&'Instagram'].filter(Boolean).join(' and ');
+  const btn=document.getElementById('social-btn');btn.disabled=true;
+  document.getElementById('social-loading').style.display='flex';
+  document.getElementById('social-result').style.display='none';
+  const prompt=`Senior fashion trend analyst specializing in social media. Search ${platforms} for: "${query}"\n\nProvide:\n**SOCIAL TREND STATUS** — Trending/Emerging/Fading? Volume?\n**KEY HASHTAGS & CONTENT FORMATS**\n**CREATOR ARCHETYPES**\n**AESTHETIC LANGUAGE** — Visual codes and styling.\n**CONSUMER PROFILE** — Who is engaging?\n**SOCIAL TO RETAIL TRANSLATION**\n**BRAND OPPORTUNITIES**\n**LONGEVITY** — Micro/Mid/Macro trend?\n\nProfessional social media trend intelligence report.`;
+  try{const result=await callAI(prompt,true);document.getElementById('social-body').textContent=result;document.getElementById('social-meta').textContent=`${platforms} · "${query}" · ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;document.getElementById('social-result').style.display='block';counts.s++;document.getElementById('s-social').textContent=counts.s;sessionHistory.unshift({type:'Social Signals',text:`${platforms}: "${query}"`,date:new Date().toLocaleString()});}catch{document.getElementById('social-body').textContent='Error.';document.getElementById('social-result').style.display='block';}
+  document.getElementById('social-loading').style.display='none';btn.disabled=false;
+}
+
+// FORECAST
+function selectHorizon(n){selectedHorizon=n;[3,6,12].forEach(h=>document.getElementById('h'+h).classList.toggle('selected',h===n));}
+function goForecast(t,c){document.getElementById('f-trend').value=t;if(c)document.getElementById('f-category').value=c;showPanel('forecast',document.querySelectorAll('.nav-btn')[5]);}
+async function generateForecast(){
+  const trend=document.getElementById('f-trend').value.trim();if(!trend){alert('Enter a trend.');return;}
+  const cat=document.getElementById('f-category').value,market=document.getElementById('f-market').value,region=document.getElementById('f-region').value,ctx=document.getElementById('f-context').value;
+  const btn=document.getElementById('forecast-btn');btn.disabled=true;
+  document.getElementById('forecast-loading').style.display='flex';
+  document.getElementById('forecast-result').style.display='none';
+  const hTxt=selectedHorizon===3?'3-month':selectedHorizon===6?'6-month':'12-month';
+  const prompt=`Senior fashion trend forecaster (WGSN/Trendalytics level). Generate predictive forecast using web data.\n\nTrend: ${trend}\nCategory: ${cat}\nMarket: ${market}\nRegion: ${region}\nHorizon: ${hTxt}\n${ctx?'Context: '+ctx:''}\n\nSearch web for current signals then forecast:\n\n**TREND STATUS NOW**\nCurrent lifecycle stage with evidence.\n\n**3-MONTH OUTLOOK**\nImmediate commercial window. Action items.\n\n**6-MONTH OUTLOOK**\nMid-season evolution and design implications.\n\n**12-MONTH OUTLOOK**\nPeak, plateau or transformation? What comes after?\n\n**TREND TRAJECTORY**\nEmerging→Building→Peak→Plateau→Decline — locate and project.\n\n**COMMERCIAL OPPORTUNITIES**\nProduct categories, price points, retail moments.\n\n**RISK FACTORS**\nWhat could accelerate or derail this?\n\n**STRATEGIC RECOMMENDATIONS**\nConcrete actions for designers, buyers, brand teams.`;
+  try{
+    const result=await callAI(prompt,true);
+    lastForecast=result;
+    document.getElementById('fc-title').textContent=`${trend} — ${hTxt} Forecast`;
+    document.getElementById('fc-sub').textContent=`${cat} · ${market} · ${region}`;
+    document.getElementById('tl-now').textContent='Building';
+    document.getElementById('tl-3').textContent=selectedHorizon===3?'Peak':'Building+';
+    document.getElementById('tl-6').textContent=selectedHorizon<=6?'Peak':'Peak';
+    document.getElementById('tl-12').textContent=selectedHorizon===12?'Plateau':'Post-Peak';
+    document.getElementById('forecast-body').textContent=result;
+    document.getElementById('forecast-result').style.display='block';
+    counts.f++;document.getElementById('s-forecasts').textContent=counts.f;
+    sessionHistory.unshift({type:'Forecast',text:`${trend} · ${hTxt} · ${market}`,date:new Date().toLocaleString()});
+  }catch{document.getElementById('forecast-body').textContent='Error.';document.getElementById('forecast-result').style.display='block';}
+  document.getElementById('forecast-loading').style.display='none';btn.disabled=false;
+}
+function downloadForecast(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lastForecast],{type:'text/plain'}));a.download='trend-atelier-forecast.txt';a.click();}
+function copyForecast(e){navigator.clipboard.writeText(lastForecast).then(()=>{e.target.textContent='✓ Copied!';setTimeout(()=>e.target.textContent='⎘ Copy',2000);});}
+
+// MANUAL ANALYZE
+function goAnalyze(t){document.getElementById('analyze-input').value=`Analyze: ${t} for SS26. Include runway presence, key brands, consumer adoption, styling implications, commercial opportunity and 12-month outlook.`;showPanel('analyze',document.querySelectorAll('.nav-btn')[6]);}
+function clearManual(){document.getElementById('analyze-input').value='';document.getElementById('manual-result').style.display='none';}
+async function runManualAnalysis(){
+  const text=document.getElementById('analyze-input').value.trim();if(!text){alert('Enter content.');return;}
+  const focuses=[...document.querySelectorAll('#panel-analyze .chip.on')].map(c=>c.textContent);
+  const btn=document.getElementById('analyze-btn');btn.disabled=true;
+  document.getElementById('analyze-loading').style.display='flex';
+  document.getElementById('manual-result').style.display='none';
+  const prompt=`Senior fashion trend analyst. Analyze:\n${focuses.length?'Focus: '+focuses.join(', '):''}\n"""\n${text}\n"""\n\nProvide:\n**TREND SIGNALS DETECTED**\n**COLOR & PALETTE**\n**SILHOUETTE & FORM**\n**MATERIALS & TEXTURE**\n**MARKET IMPLICATIONS**\n**TREND VELOCITY**\n**12-MONTH FORECAST**\n\nProfessional fashion language.`;
+  try{const result=await callAI(prompt,false);document.getElementById('manual-body').textContent=result;document.getElementById('manual-meta').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});document.getElementById('manual-result').style.display='block';counts.a++;document.getElementById('s-analyses').textContent=counts.a;sessionHistory.unshift({type:'Analysis',text:text.slice(0,80)+'…',date:new Date().toLocaleString()});}catch{document.getElementById('manual-body').textContent='Error.';document.getElementById('manual-result').style.display='block';}
+  document.getElementById('analyze-loading').style.display='none';btn.disabled=false;
+}
+
+// REPORTS
+async function generateReport(){
+  const season=document.getElementById('r-season').value,market=document.getElementById('r-market').value,focus=document.getElementById('r-focus').value,tone=document.getElementById('r-tone').value,ctx=document.getElementById('r-context').value;
+  const btn=document.getElementById('report-btn');btn.disabled=true;
+  document.getElementById('report-loading').style.display='flex';
+  document.getElementById('report-out').style.display='none';
+  const prompt=`Senior fashion trend forecaster (WGSN level). Write a comprehensive trend intelligence report.\nSeason: ${season}\nMarket: ${market}\nFocus: ${focus}\nTone: ${tone}\n${ctx?'Context: '+ctx:''}\n\nFull report: Executive Summary, Key Trend Directions (3-5 trends), Color Story, Silhouette & Form, Materials, Key Pieces, Consumer Mindset, Commercial Recommendations, 12-Month Outlook. Authoritative and specific.`;
+  try{const result=await callAI(prompt,false);lastReport=result;document.getElementById('rc-title').textContent=focus;document.getElementById('rc-sub').textContent=`${season} · ${market}`;document.getElementById('report-body').textContent=result;document.getElementById('report-out').style.display='block';counts.r++;document.getElementById('s-reports').textContent=counts.r;sessionHistory.unshift({type:'Report',text:`${focus} — ${season} — ${market}`,date:new Date().toLocaleString()});}catch{alert('Error. Please try again.');}
+  document.getElementById('report-loading').style.display='none';btn.disabled=false;
+}
+function downloadReport(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([lastReport],{type:'text/plain'}));a.download='trend-atelier-report.txt';a.click();}
+function copyReport(e){navigator.clipboard.writeText(lastReport).then(()=>{e.target.textContent='✓ Copied!';setTimeout(()=>e.target.textContent='⎘ Copy',2000);});}
+
+// HISTORY
+function renderHistory(){
+  const c=document.getElementById('history-container');
+  if(!sessionHistory.length){c.innerHTML='<div class="hist-empty">No activity yet.</div>';return;}
+  c.innerHTML='<div class="hist-list">'+sessionHistory.map(h=>`<div class="hi"><div><div class="hi-type">✦ ${h.type}</div><div class="hi-text">${h.text}</div></div><div class="hi-date">${h.date}</div></div>`).join('')+'</div>';
+}
+</script>
+</body>
+</html>
